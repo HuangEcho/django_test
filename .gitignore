@@ -6,3 +6,5 @@ __pycache__
 media
 
 *.bak
+venv
+*/__pycache__
