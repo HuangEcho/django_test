@@ -10,9 +10,10 @@ class ApiStepAdmin(admin.TabularInline):
     extra = 1
 
 
-class ApiTestAdmin(admin.TabularInline):
+# 这里要记成admin.ModelAdmin, 在admin.site.register里才能注册
+class ApiTestAdmin(admin.ModelAdmin):
     list_display = ["api_test_name", "api_tester", "api_test_result", "create_time", "id"]
     inlines = [ApiStepAdmin]
 
 
-admin.site.register(ApiTest)
+admin.site.register(ApiTest, ApiTestAdmin)
