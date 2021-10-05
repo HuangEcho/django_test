@@ -4,7 +4,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
-from apitest.models import ApiTest, ApiStep
+from apitest.models import ApiTest, ApiStep, Apis
 
 # Create your views here.
 
@@ -52,4 +52,11 @@ def apistep_manage(request):
     username = request.session.get("user", "")
     apistep_list = ApiStep.objects.all()
     return render(request, "apistep_manage.html", {"user": username, "api_steps": apistep_list})
+
+# 单一接口管理
+@login_required
+def apis_manage(request):
+    username = request.session.get("user", "")
+    apis_list = Apis.objects.all()
+    return render(request, "apis_manage.html", {"user": username, "apis": apis_list})
 

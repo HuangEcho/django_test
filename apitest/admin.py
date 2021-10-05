@@ -1,5 +1,6 @@
 from django.contrib import admin
-from apitest.models import ApiTest, ApiStep
+from apitest.models import ApiTest, ApiStep, Apis
+from product.models import Product
 
 
 # Register your models here.
@@ -17,3 +18,11 @@ class ApiTestAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ApiTest, ApiTestAdmin)
+
+
+class ApisAdmin(admin.TabularInline):
+    list_display = ["api_name", "api_url", "api_param_value", "api_method", "api_result", "api_status", "create_time",
+                    "id", "product"]
+
+
+admin.site.register(Apis)
