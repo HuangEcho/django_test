@@ -18,6 +18,7 @@ from django.urls import path
 from apitest import api_views
 from product import product_views
 from bug import bug_views
+from settings import settings_views
 
 
 urlpatterns = [
@@ -31,4 +32,6 @@ urlpatterns = [
     path("apistep_manage/", api_views.apistep_manage),
     path("apis_manage/", api_views.apis_manage),
     path("bug_manage/", bug_views.bug_manage),
+    path("setting_manage/", settings_views.setting_manage),
+    path("user/", settings_views.setting_user),
 ]

@@ -4,7 +4,7 @@ from settings.models import Settings
 
 # Register your models here.
 class SettingsAdmin(admin.ModelAdmin):
-    list_display = {"settings_name", "settings_value", "id"}
+    list_display = {"setting_name", "setting_value", "id"}
 
 
 # 注册models的类
