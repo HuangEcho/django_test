@@ -19,6 +19,7 @@ from apitest import api_views
 from product import product_views
 from bug import bug_views
 from settings import settings_views
+from app_test import app_test_views
 
 
 urlpatterns = [
@@ -34,4 +35,6 @@ urlpatterns = [
     path("bug_manage/", bug_views.bug_manage),
     path("setting_manage/", settings_views.setting_manage),
     path("user/", settings_views.setting_user),
+    path("app_case/", app_test_views.app_case_manage),
+    path("app_case_step/", app_test_views.app_case_step_manage),
 ]

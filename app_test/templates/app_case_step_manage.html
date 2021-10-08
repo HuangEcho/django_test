@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% load static %}
+    <title>产品自动化测试平台</title>
+</head>
+<body role="document">
+<!--导航栏-->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">&nbsp;</a>
+        <ul class="nav justify-content-center"></ul>
+        <ul class="nav justify-content-end">
+            <li class="nav-link"><a style="color: white" href="#">{{ user }}</a></li>
+            <li class="nav-lin"><a style="color: white" href="/logout/">退出</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!--测试步骤-->
+<div class="row" style="padding-top: 70px">
+    <div class="col-md-11">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>所属产品</th>
+                <th>所属用例</th>
+                <th>步骤</th>
+                <th>定位方式</th>
+                <th>控件元素</th>
+                <th>操作方法</th>
+                <th>测试数据</th>
+                <th>验证数据</th>
+                <th>测试结果</th>
+                <th>创建时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for app_case_step in app_case_steps %}
+            <tr>
+                <td>{{ app_case_step.app_case.Product.product_name}}</td>
+                <td>{{ app_case_step.app_case.id}}:{{ app_case_step.app_case.app_case_name }}</td>
+                <td>{{ app_case_step.app_case_find_method}}</td>
+                <td>{{ app_case_step.app_case_element}}</td>
+                <td>{{ app_case_step.app_case_op_method}}</td>
+                <td>{{ app_case_step.app_case_test_data}}</td>
+                <td>{{ app_case_step.app_case_assert_data}}</td>
+                <td>{% if app_case_step.app_case_result == 1 %}
+                <a style="color:green">{{ app_case_step.app_case_result }}</a>
+                    {% else %}
+                    <a style="color: red">{{app_case_step.app_case_result}}</a>
+                    {% endif %}
+                </td>
+                <td>app_case_step.create_time</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
