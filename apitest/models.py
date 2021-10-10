@@ -1,5 +1,5 @@
 from django.db import models
-from product.models import Product
+# from product.models import Product
 
 
 # Create your models here.
@@ -8,7 +8,7 @@ class ApiTest(models.Model):
     # 如果是数字或者时间，要求 blank=True,null=True，才允许不设置；
     # blank=True不会改变数据库属性，不需要执行数据库命令；null=True会改变数据库属性，需要执行
     # 表单的必填 required=True; 非必填required=False
-    Product = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True)
     api_test_name = models.CharField("流程接口名称", max_length=64)
     # 设置description可以不填写
     api_test_desc = models.CharField("描述", max_length=64, null=True, blank=True)
@@ -43,7 +43,7 @@ class ApiStep(models.Model):
 
 
 class Apis(models.Model):
-    Product = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey("product.Product", on_delete=models.CASCADE, null=True)
     api_name = models.CharField("接口名称", max_length=100)
     api_url = models.CharField("url地址", max_length=200)
     api_param_value = models.CharField("请求参数和值", max_length=800)
