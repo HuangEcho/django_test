@@ -23,8 +23,8 @@ def login(request):
         if user and user.is_active:
             auth.login(request, user)
             request.session["user"] = username
-            response = HttpResponseRedirect("/home/")
-            return response
+            request.session["is_login"] = True
+            return HttpResponseRedirect("/home/")
         else:
             return render(request, "login.html", {"error": "username or password error"})
     return render(request, "login.html")
