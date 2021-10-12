@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    <meta charset="UTF-8">
+    <title>产品自动化管理平台</title>
+</head>
+<body role="document">
+
+<div class="row" style="padding-top: 70px">
+    <div class="col-md-11">
+        <table class="table table-striped">
+            <div style="position:absolute; right: 10px; width: 10px">
+                <tr>
+<!--                    多个th标签，可以用于页面调整-->
+<!--                    TODO: 需要了解如何更好的调整画面-->
+                    <th><th><th><th><th>单一接口扫描-自动化测试汇总报告</th>
+                </tr>
+                <tr>
+                    <th>用例总数</th>
+                    <td>{{api_counts}}</td>
+                </tr>
+                <tr>
+                    <th>通过用例数量</th>
+                    <td>{{api_success_counts}}</td>
+                </tr>
+                <tr>
+                    <th>不通过用例数量</th>
+                    <td>{{api_fail_counts}}</td>
+                </tr>
+            </div>
+        </table>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th><th><th><th><th><th>失败接口列表</th>
+            </tr>
+            <tr>
+                <th>ID</th>
+                <th>产品</th>
+                <th>测试用例名称</th>
+                <th>URL地址</th>
+                <th>参数=值</th>
+                <th>方法</th>
+                <th>预期</th>
+                <th>测试结果</th>
+                <th>创建</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for api in api_list %}
+            <tr>
+                {% if api.api_status == 0 %}
+                <td>{{api.id}}</td>
+                <td>{{api.product.product_name}}</td>
+                <td>{{api.api_name}}</td>
+                <td>{{api.api_url}}</td>
+                <td>{{api.api_param_value}}</td>
+                <td>{{api.api_method}}</td>
+                <td>{{api.api_result}}</td>
+                <td>
+                    {% if api.api_status == 1 %}
+                    <a style="color: green">{{api.api_status}}</a>
+                    {% else %}
+                    <a style="color: red">{{api.api_status}}</a>
+                    {% endif %}
+                </td>
+                <td>{{api.create_time}}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

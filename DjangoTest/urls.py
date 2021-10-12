@@ -40,4 +40,5 @@ urlpatterns = [
     path("app_case_step/", app_test_views.app_case_step_manage),
     path("web_case/", web_views.web_case_manage),
     path("web_case_step/", web_views.web_case_step_manage),
+    path("report/", api_views.test_report),
 ]

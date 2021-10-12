@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.db import connection
 
 from apitest.models import ApiTest, ApiStep, Apis
 
@@ -59,4 +60,35 @@ def apis_manage(request):
     username = request.session.get("user", "")
     apis_list = Apis.objects.all()
     return render(request, "apis_manage.html", {"user": username, "apis": apis_list})
+
+
+@login_required
+def test_report(request):
+    username = request.session.get("user", "")
+    api_list = Apis.objects.all()
+    api_counts = api_list.count()
+
+    # 直接用filter是最简单的
+    api_success_counts = Apis.objects.filter(api_status=1).count()
+    api_fail_counts = Apis.objects.filter(api_status=0).count()
+
+    # # 用connection去执行原始sql
+    # with connection.cursor() as cursor:
+    #     cursor.execute("select count(id) from apitest_apis where api_status==0")
+    #     api_fail_counts = cursor.fetchone()[0]
+    #     cursor.execute("select count(id) from apitest_apis where api_status==1")
+    #     api_success_counts = cursor.fetchone()[0]
+
+    # # 这个写法有点蠢，获取raw会返回RawQuerySet实例，需要用迭代获取对象信息
+    # api_fail_counts, api_success_counts = 0, 0
+    # for api in Apis.objects.raw("select id, count(id) as fail_count from apitest_apis where api_status==0"):
+    #     api_fail_counts = api.fail_count
+    #     break
+    # for api in Apis.objects.raw("select id, count(id) as success_count from apitest_apis where api_status==1"):
+    #     api_success_counts = api.success_count
+    #     break
+
+    return render(request, "report.html", {"user": username, "api_list": api_list, "api_counts": api_counts,
+                                           "api_success_counts": api_success_counts, "api_fail_counts": api_fail_counts})
+
 
