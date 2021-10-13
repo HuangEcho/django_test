@@ -13,6 +13,7 @@
     <font size="1">
         <h1>自动化平台测试开发</h1>
     </font>
+<!--    TODO: 这里需要处理一下密码错误的时候的返回，function里有提供error，这里没有处理呀-->
     <form method="post" action="/login/">
         {% csrf_token %}
         <br><a>&nbsp;&nbsp;&nbsp;用户名 &nbsp;&nbsp;</a><input name="username" type="text" placeholder="test">

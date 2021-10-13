@@ -33,6 +33,7 @@ urlpatterns = [
     path("apitest_manage/", api_views.apitest_manage),
     path("apistep_manage/", api_views.apistep_manage),
     path("apis_manage/", api_views.apis_manage),
+    path("report/", api_views.test_report),
     path("bug_manage/", bug_views.bug_manage),
     path("setting_manage/", settings_views.setting_manage),
     path("user/", settings_views.setting_user),
@@ -40,5 +41,5 @@ urlpatterns = [
     path("app_case_step/", app_test_views.app_case_step_manage),
     path("web_case/", web_views.web_case_manage),
     path("web_case_step/", web_views.web_case_step_manage),
-    path("report/", api_views.test_report),
+
 ]
