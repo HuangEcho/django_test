@@ -29,15 +29,15 @@ class ApiTestCase(object):
         return res.url
 
     # TODO: 这里的想法是把要验证的点都写上，意味着不能动态，只能自己写
-    def read_res(self, res, res_check):
-        for key, value in res_check.items():
+    def check_response_exception(self, response, exception):
+        for key, value in exception.items():
             if "status_code" == key:
-                if value != self.get_status_code(res):
-                    return "response key {0} not equal expect value {1}".format(self.get_status_code(res), value)
+                if value != self.get_status_code(response):
+                    return "response key {0} not equal expect value {1}".format(self.get_status_code(response), value)
             elif "url" == key:
                 # is是判断内存，in判断值
-                if value not in self.get_url(res) and len(value) != len(self.get_url(res)):
-                    return "response key {0} not equal expect value {1}".format(self.get_url(res), value)
+                if value not in self.get_url(response) and len(value) != len(self.get_url(response)):
+                    return "response key {0} not equal expect value {1}".format(self.get_url(response), value)
             else:
                 return "{0} not in response".format(key)
 
@@ -123,7 +123,7 @@ class ApiTestCase(object):
             print("response is get {0}".format(response))
             print(response.url)
             responses.append(response)
-            res = self.read_res(response, expected_response)
+            res = self.check_response_exception(response, expected_response)
             res_flags.append(res)
 
             if "pass" == res:
