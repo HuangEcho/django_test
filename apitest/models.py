@@ -29,12 +29,13 @@ class ApiStep(models.Model):
     api_name = models.CharField("接口名称", max_length=100)
     api_url = models.CharField("url地址", max_length=200)
     api_step = models.CharField("测试步骤", max_length=100, null=True)
-    api_param_value = models.CharField("请求参数和值", max_length=800)
+    api_param_value = models.CharField("body", max_length=800)
 
-    REQUEST_METHOD = (("get", "get"), ("post", "post"), ("put", "put"), ("delete", "delete"), ("patch", "patch"))
+    REQUEST_METHOD = (("get", "get"), ("post", "post"), ("put", "put"), ("delete", "delete"))
     api_method = models.CharField(verbose_name="请求方法", choices=REQUEST_METHOD, default="get", max_length=200, null=True)
-    api_result = models.CharField("预期结果", max_length=200)
-    api_response = models.CharField("响应数据", max_length=5000, null=True)
+    api_result = models.CharField("预期结果", max_length=800)
+    # TODO: 这里可以考虑如何把响应结果存储在一个路径下，然后这里只放地址，就可以超链接过去
+    api_response = models.CharField("响应数据", max_length=800, null=True, blank=True)
     api_status = models.BooleanField("是否通过")
     create_time = models.DateTimeField("创建时间", auto_now=True)
 

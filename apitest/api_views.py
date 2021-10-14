@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
@@ -16,19 +16,27 @@ def test(request):
 
 def login(request):
     # return render(request, "login.html")
+    username, password = "", ""
     if request.POST:
         # username, password = "", ""
         username = request.POST.get("username")
         password = request.POST.get("password")
-        user = auth.authenticate(username=username, password=password)
-        if user and user.is_active:
-            auth.login(request, user)
-            request.session["user"] = username
-            request.session["is_login"] = True
-            return HttpResponseRedirect("/home/")
-        else:
-            return render(request, "login.html", {"error": "username or password error"})
-    return render(request, "login.html")
+    elif request.method == "POST":
+        body = request.body.decode(encoding="utf-8")
+        body = QueryDict(body).dict()
+        username = body["username"]
+        password = body["password"]
+
+    user = auth.authenticate(username=username, password=password)
+    if user and user.is_active:
+        auth.login(request, user)
+        request.session["user"] = username
+        request.session["is_login"] = True
+        return HttpResponseRedirect("/home/")
+    else:
+        return render(request, "login.html", {"error": "username or password error"})
+
+    # return render(request, "login.html")
 
 
 def home(request):

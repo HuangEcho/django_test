@@ -11,21 +11,36 @@ import time
 HOSTNAME = "127.0.0.1"
 
 
-# TODO: 要用class来改写这个文件，不然第一眼都无法区分那些是函数那些是变量了
 class ApiTestCase(object):
     def __init__(self):
         self.task_id = ""
         self.task_num = ""
         self.id = ""
 
+    # 暂时用不上
     def url_param(self, param):
         param_1 = param.replace("&quot;", "\"")
         return param_1
 
+    def get_status_code(self, res):
+        return res.status_code
+
+    def get_url(self, res):
+        return res.url
+
+    # TODO: 这里的想法是把要验证的点都写上，意味着不能动态，只能自己写
     def read_res(self, res, res_check):
-        if str(res) == res_check:
-            return "pass"
-        return "fail"
+        for key, value in res_check.items():
+            if "status_code" == key:
+                if value != self.get_status_code(res):
+                    return "response key {0} not equal expect value {1}".format(self.get_status_code(res), value)
+            elif "url" == key:
+                if value is not self.get_url(res):
+                    return "response key {0} not equal expect value {1}".format(self.get_url(res), value)
+            else:
+                return "{0} not in response".format(key)
+
+        return "pass"
 
     def credential_id(self):
         url = "http://api.test.com.cn/api/security/authentication/signin/web"
@@ -50,19 +65,17 @@ class ApiTestCase(object):
         cursor.close()
         conn.close()
 
-    def write_bug(self, bug_id, interface_name, request, response, res_check):
+    def write_bug(self, bug_id, interface_name, url, res):
         interface_name = interface_name.encode("utf-8")
-        res_check = res_check.encode("utf-8")
         now = time.strftime("%Y-%m-%d %H:%M:%S")
-        bug_name = "{0}_{1}_出错了".format(bug_id, interface_name)
-        # TODO: <br/>在html里换行符，这里是否需要换/n呢？
-        bug_detail = "[请求数据]<br/>{0}<br/>[预期结果]<br/>{1}<br/>[响应数据]<br/>{2}<br/>".format(request, res_check, response)
-        print(bug_detail)
+        bug_name = "{0}_{1}_{2}".format(bug_id, str(interface_name, encoding="utf-8"), url)
+        bug_detail = res
 
         sql = "insert into 'bug_bug' ('bug_name', 'bug_detail', 'bug_status', 'bug_level', 'bug_creator', 'bug_assign', 'create_time', 'product_id') " \
               "values ('{0}', '{1}', '1', '1', 'test', 'test', '{2}', '2');".format(bug_name, bug_detail, now)
-        conn = sqlite3.connect("../db.sqlite3")
+        conn = sqlite3.connect("../djangotest.sqlite3")
         cursor = conn.cursor()
+        cursor.execute(sql)
         conn.commit()
         cursor.close()
         conn.close()
@@ -75,15 +88,11 @@ class ApiTestCase(object):
         for case in case_list:
             try:
                 # TODO:看看怎么写的更好看
-                case_id = case[0]
-                interface_name = case[1]
-                url = case[2]
-                method = case[3]
-                param = case[4]
-                res_check = case[5]
+                case_id, interface_name, url, method, param, expected_response = case
             except Exception as e:
                 return "测试用例格式不正确， {0}".format(e)
-
+            # eval将str转化为dict
+            expected_response = eval(expected_response)
             param = self.url_param(param)
             url = "http://" + url
             request_urls.append(url)
@@ -107,20 +116,19 @@ class ApiTestCase(object):
                 response = requests.post(url, param, headers=headers)
 
             print("response is get {0}".format(response))
+            print(response.url)
             responses.append(response)
-            res = self.read_res(response.status_code, res_check)
-            print(res)
+            res = self.read_res(response, expected_response)
+            res_flags.append(res)
 
             if "pass" == res:
                 self.write_result(case_id, "1")
-                res_flags.append("pass")
             else:
                 self.write_result(case_id, "0")
-                res_flags.append("fail")
-            self.write_bug(case_id, interface_name, url, response, res_check)
+                self.write_bug(case_id, interface_name, url, res)
 
     def read_sql_case(self):
-        sql = "select id, api_name, api_url, api_method, api_param_value, api_result, api_status from apitest_apistep where apitest_apistep.id<10"
+        sql = "select id, api_name, api_url, api_method, api_param_value, api_result from apitest_apistep where apitest_apistep.id<10"
         conn = sqlite3.connect("../djangotest.sqlite3")
         cursor = conn.cursor()
         cursor.execute(sql)
@@ -138,3 +146,6 @@ class ApiTestCase(object):
 
 if __name__ == '__main__':
     ApiTestCase().read_sql_case()
+
+
+
