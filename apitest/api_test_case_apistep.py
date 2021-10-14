@@ -35,7 +35,8 @@ class ApiTestCase(object):
                 if value != self.get_status_code(res):
                     return "response key {0} not equal expect value {1}".format(self.get_status_code(res), value)
             elif "url" == key:
-                if value is not self.get_url(res):
+                # is是判断内存，in判断值
+                if value not in self.get_url(res) and len(value) != len(self.get_url(res)):
                     return "response key {0} not equal expect value {1}".format(self.get_url(res), value)
             else:
                 return "{0} not in response".format(key)
@@ -92,7 +93,11 @@ class ApiTestCase(object):
             except Exception as e:
                 return "测试用例格式不正确， {0}".format(e)
             # eval将str转化为dict
-            expected_response = eval(expected_response)
+            try:
+                expected_response = eval(expected_response)
+            except:
+                print("please check 预期结果 format")
+                return
             param = self.url_param(param)
             url = "http://" + url
             request_urls.append(url)
