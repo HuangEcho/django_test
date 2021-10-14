@@ -36,8 +36,9 @@ class ApiTestCase(object):
                     return "response key {0} not equal expect value {1}".format(self.get_status_code(response), value)
             elif "url" == key:
                 # is是判断内存，in判断值
-                if value not in self.get_url(response) and len(value) != len(self.get_url(response)):
+                if value not in self.get_url(response) or len(value) != len(self.get_url(response)):
                     return "response key {0} not equal expect value {1}".format(self.get_url(response), value)
+            # 如果还有其他要验证的点，需要在这里加上
             else:
                 return "{0} not in response".format(key)
 
@@ -56,8 +57,8 @@ class ApiTestCase(object):
     def write_result(self, case_id, result):
         result = result.encode("utf-8")
         now = time.strftime("%Y-%m-%d %H:%M:%S")
-        sql = "update apitest_apistep set api_status=? where id=?"
-        param = (result, case_id)
+        sql = "update apitest_apistep set api_status=?, create_time=? where id=?"
+        param = (result.decode("utf-8"), now, case_id)
 
         conn = sqlite3.connect("../djangotest.sqlite3")
         cursor = conn.cursor()
