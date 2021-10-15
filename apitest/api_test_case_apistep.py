@@ -22,23 +22,15 @@ class ApiTestCase(object):
         param_1 = param.replace("&quot;", "\"")
         return param_1
 
-    def get_status_code(self, res):
-        return res.status_code
-
-    def get_url(self, res):
-        return res.url
-
-    # TODO: 这里的想法是把要验证的点都写上，意味着不能动态，只能自己写
+    # TODO: 目前写的，只验证了url和status_code，可以直接转化为str，但对于list，dict等类型就没有处理到
     def check_response_exception(self, response, exception):
         for key, value in exception.items():
-            if "status_code" == key:
-                if value != self.get_status_code(response):
-                    return "response key {0} not equal expect value {1}".format(self.get_status_code(response), value)
-            elif "url" == key:
-                # is是判断内存，in判断值
-                if value not in self.get_url(response) or len(value) != len(self.get_url(response)):
-                    return "response key {0} not equal expect value {1}".format(self.get_url(response), value)
-            # 如果还有其他要验证的点，需要在这里加上
+            if hasattr(response, key):
+                # 这里只验证了结果只在response第一个层级，且为int或str这种类型的，没有处理list这些的，等后面遇到了，再写
+                except_value = str(getattr(response, key))
+                value = str(value)
+                if except_value not in value or len(except_value) != len(value):
+                    return "response key {0} not equal expect value {1}".format(value, except_value)
             else:
                 return "{0} not in response".format(key)
 

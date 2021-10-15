@@ -8,3 +8,5 @@ media
 *.bak
 venv
 */__pycache__
+
+*.sqlite3
