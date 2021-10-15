@@ -13,14 +13,7 @@ HOSTNAME = "127.0.0.1"
 
 class ApiTestCase(object):
     def __init__(self):
-        self.task_id = ""
-        self.task_num = ""
-        self.id = ""
-
-    # 暂时用不上
-    def url_param(self, param):
-        param_1 = param.replace("&quot;", "\"")
-        return param_1
+        self.name = ""
 
     # TODO: 目前写的，只验证了url和status_code，可以直接转化为str，但对于list，dict等类型就没有处理到
     def check_response_exception(self, response, exception):
@@ -36,25 +29,22 @@ class ApiTestCase(object):
 
         return "pass"
 
-    def credential_id(self):
-        url = "http://api.test.com.cn/api/security/authentication/signin/web"
-        body_data = json.dumps({"Identity": "test", "Password": "test"})
-        headers = {"Connection": "keep-alive", "Content-Type": "application/json"}
-        response = requests.post(url=url, data=body_data, headers=headers)
-        data = response.text
-        regx = '.*"CredentialId":"(.*)","Scene"'
-        pm = re.search(regx, data)
-        self.id = pm.group(1)
-
     def write_result(self, case_id, result):
         result = result.encode("utf-8")
         now = time.strftime("%Y-%m-%d %H:%M:%S")
-        sql = "update apitest_apistep set api_status=?, create_time=? where id=?"
-        param = (result.decode("utf-8"), now, case_id)
 
         conn = sqlite3.connect("../djangotest.sqlite3")
         cursor = conn.cursor()
+
+        # sqlite不支持update与join一起，需要用子表改写
+        # sql = "update apitest_apitest inner join apitest_apistep on apitest_apitest.id=apitest_apistep.api_test_id set apitest_apitest.api_test_result=?, apitest_apitest.create_time=?, apitest_apistep.api_status=?, apitest_apistep.create_time=? where apitest_apistep.id=?"
+        sql = "update apitest_apistep set api_status=?, create_time=? where id=?"
+        param = (result.decode("utf-8"), now, case_id)
         cursor.execute(sql, param)
+        sql = "update apitest_apitest set api_test_result=?, create_time=? where id=(select api_test_id from apitest_apistep where id=?)"
+        param = (result.decode("utf-8"), now, case_id)
+        cursor.execute(sql, param)
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -81,7 +71,6 @@ class ApiTestCase(object):
 
         for case in case_list:
             try:
-                # TODO:看看怎么写的更好看
                 case_id, interface_name, url, method, param, expected_response = case
             except Exception as e:
                 return "测试用例格式不正确， {0}".format(e)
@@ -91,7 +80,7 @@ class ApiTestCase(object):
             except:
                 print("please check 预期结果 format")
                 return
-            param = self.url_param(param)
+            # param = self.url_param(param)
             url = "http://" + url
             request_urls.append(url)
             response = ""
@@ -110,15 +99,13 @@ class ApiTestCase(object):
                     body_data = param
                 response = requests.put(url, body_data, headers=headers)
             elif method.upper() == "POST":
-                headers = {"Authorization": "Credential" + self.id, "Content-Type": "application/json"}
+                headers = {"Authorization": "Credential", "Content-Type": "application/json"}
                 response = requests.post(url, param, headers=headers)
 
-            print("response is get {0}".format(response))
-            print(response.url)
             responses.append(response)
             res = self.check_response_exception(response, expected_response)
             res_flags.append(res)
-
+            print("{0} result is {1}".format(interface_name, res))
             if "pass" == res:
                 self.write_result(case_id, "1")
             else:
@@ -126,7 +113,7 @@ class ApiTestCase(object):
                 self.write_bug(case_id, interface_name, url, res)
 
     def read_sql_case(self):
-        sql = "select id, api_name, api_url, api_method, api_param_value, api_result from apitest_apistep where apitest_apistep.id<10"
+        sql = "select apitest_apistep.id, apitest_apitest.api_test_name, apitest_apistep.api_url, apitest_apistep.api_method, apitest_apistep.api_param_value, apitest_apistep.api_result from apitest_apistep inner join apitest_apitest on apitest_apistep.api_test_id=apitest_apitest.id"
         conn = sqlite3.connect("../djangotest.sqlite3")
         cursor = conn.cursor()
         cursor.execute(sql)
