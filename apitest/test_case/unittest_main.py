@@ -5,10 +5,8 @@ import os
 from HtmlTestRunner import HTMLTestRunner
 import unittest
 
-import time
-
 
 if __name__ == '__main__':
     test_cases = unittest.defaultTestLoader.discover("./")
-    runner = HTMLTestRunner()
+    runner = HTMLTestRunner(report_title="api test result")
     runner.run(test_cases)

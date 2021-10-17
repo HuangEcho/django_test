@@ -1,17 +1,12 @@
 # create_author: HuangYaxing
 # create_time: 2021/10/12 8:43 下午
 
-import json
 import sqlite3
 
-import re
 import requests
 import time
 
-# import HtmlTestRunner
-from HtmlTestRunner import HTMLTestRunner
 import unittest
-from idlelib.rpc import response_queue
 
 HOSTNAME = "127.0.0.1"
 
@@ -132,6 +127,7 @@ class ApiTestCase(object):
         conn.close()
 
 
+# unnitest.TestCase
 class TestCase(unittest.TestCase):
     # lost assert
     def test_read_sql_case(self):
