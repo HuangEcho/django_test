@@ -8,12 +8,15 @@ import re
 import requests
 import time
 
+# import HtmlTestRunner
+from HtmlTestRunner import HTMLTestRunner
+import unittest
+from idlelib.rpc import response_queue
+
 HOSTNAME = "127.0.0.1"
 
 
 class ApiTestCase(object):
-    def __init__(self):
-        self.name = ""
 
     # TODO: 目前写的，只验证了url和status_code，可以直接转化为str，但对于list，dict等类型就没有处理到
     def check_response_exception(self, response, exception):
@@ -33,7 +36,7 @@ class ApiTestCase(object):
         result = result.encode("utf-8")
         now = time.strftime("%Y-%m-%d %H:%M:%S")
 
-        conn = sqlite3.connect("../djangotest.sqlite3")
+        conn = sqlite3.connect("../../djangotest.sqlite3")
         cursor = conn.cursor()
 
         # sqlite不支持update与join一起，需要用子表改写
@@ -57,7 +60,7 @@ class ApiTestCase(object):
 
         sql = "insert into 'bug_bug' ('bug_name', 'bug_detail', 'bug_status', 'bug_level', 'bug_creator', 'bug_assign', 'create_time', 'product_id') " \
               "values ('{0}', '{1}', '1', '1', 'test', 'test', '{2}', '2');".format(bug_name, bug_detail, now)
-        conn = sqlite3.connect("../djangotest.sqlite3")
+        conn = sqlite3.connect("../../djangotest.sqlite3")
         cursor = conn.cursor()
         cursor.execute(sql)
         conn.commit()
@@ -112,9 +115,9 @@ class ApiTestCase(object):
                 self.write_result(case_id, "0")
                 self.write_bug(case_id, interface_name, url, res)
 
-    def read_sql_case(self):
+    def test_read_sql_case(self):
         sql = "select apitest_apistep.id, apitest_apitest.api_test_name, apitest_apistep.api_url, apitest_apistep.api_method, apitest_apistep.api_param_value, apitest_apistep.api_result from apitest_apistep inner join apitest_apitest on apitest_apistep.api_test_id=apitest_apitest.id"
-        conn = sqlite3.connect("../djangotest.sqlite3")
+        conn = sqlite3.connect("../../djangotest.sqlite3")
         cursor = conn.cursor()
         cursor.execute(sql)
         info = cursor.fetchall()
@@ -129,8 +132,27 @@ class ApiTestCase(object):
         conn.close()
 
 
+class TestCase(unittest.TestCase):
+    # lost assert
+    def test_read_sql_case(self):
+        sql = "select apitest_apistep.id, apitest_apitest.api_test_name, apitest_apistep.api_url, apitest_apistep.api_method, apitest_apistep.api_param_value, apitest_apistep.api_result from apitest_apistep inner join apitest_apitest on apitest_apistep.api_test_id=apitest_apitest.id"
+        conn = sqlite3.connect("../../djangotest.sqlite3")
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        info = cursor.fetchall()
+
+        case_list = []
+        for ii in info:
+            case_list.append(ii)
+        ApiTestCase().interface_test(case_list)
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
 if __name__ == '__main__':
-    ApiTestCase().read_sql_case()
+    ApiTestCase().test_read_sql_case()
 
 
 
