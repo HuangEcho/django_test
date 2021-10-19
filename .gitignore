@@ -11,3 +11,5 @@ venv
 
 *.sqlite3
 */*/reports
+*/*/allure-report
+*/*/.pytest_cache
