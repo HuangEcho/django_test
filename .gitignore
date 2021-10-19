@@ -10,6 +10,6 @@ venv
 */__pycache__
 
 *.sqlite3
-*/*/reports
-*/*/allure-report
-*/*/.pytest_cache
+*/*/reports/
+*/*/allure-report/
+*/*/.pytest_cache/
